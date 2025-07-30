@@ -11,7 +11,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define ECHO 10
 #define BUTTON_PIN 7
 
-NewPing sonar(TRIG, ECHO, 400); // макс. расстояние 400 см
+NewPing sonar(TRIG, ECHO, 400); // max distance is 400cm
 
 float dist_3[3] = {0.0, 0.0, 0.0};
 float dist, dist_filtered;
@@ -19,7 +19,7 @@ float k;
 byte i = 0;
 bool freeze = false;
 bool lastButtonState = HIGH;
-bool freezeButtonState = HIGH;   // Для устойчивого состояния кнопки после debounce
+bool freezeButtonState = HIGH;   //for a stable state of the button after debounce
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
 unsigned long lastMeasure = 0;
@@ -43,8 +43,7 @@ void setup() {
 }
 
 void loop() {
-  // КНОПКА — антидребезг и переключение freeze
-  bool reading = digitalRead(BUTTON_PIN);
+  bool reading = digitalRead(BUTTON_PIN); //// BUTTON: anti-bounce and freeze switching
 
   if (reading != lastButtonState) {
     lastDebounceTime = millis();
@@ -54,14 +53,14 @@ void loop() {
     if (reading != freezeButtonState) {
       freezeButtonState = reading;
 
-      if (freezeButtonState == LOW) {  // кнопка нажата
+      if (freezeButtonState == LOW) {  // button is pressed
         freeze = !freeze;
       }
     }
   }
   lastButtonState = reading;
 
-  // ИЗМЕРЕНИЕ расстояния (если не заморожено)
+  // distance measurements
   if (!freeze && millis() - lastMeasure > 300) {
     dist_3[i] = sonar.ping_cm();
     i = (i + 1) % 3;
@@ -74,9 +73,7 @@ void loop() {
     lastMeasure = millis();
   }
 
-  // ОТРИСОВКА
   display.clearDisplay();
-
   display.setTextSize(2);
   display.setCursor(0, 0);
 
@@ -107,8 +104,7 @@ void loop() {
   display.display();
 }
 
-// медианный фильтр из 3 чисел
-float middle_of_3(float a, float b, float c) {
+float middle_of_3(float a, float b, float c) { // median filter
   if ((a <= b) && (a <= c)) return (b <= c) ? b : c;
   else if ((b <= a) && (b <= c)) return (a <= c) ? a : c;
   else return (a <= b) ? a : b;
